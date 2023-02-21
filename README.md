@@ -19,4 +19,4 @@ You can also multi-search OP.GG and U.GG from within app
 5. Press Get Names
 
 NOTE: Gets only the names from your team , not enemy team!
-      Made changes in the original program for fun, discord was just an extra.
+       <br /> Made changes in the original program for fun, discord was just an extra.
