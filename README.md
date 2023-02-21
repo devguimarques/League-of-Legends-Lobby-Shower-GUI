@@ -1,5 +1,6 @@
 # GUI
 ![Example](example.png)
+![Example](https://prnt.sc/_y2Q5gO71D5Q)
 # Overview
 
 League of Legends made a change to hide usernames from champion select in Solo/Duo and Flex
