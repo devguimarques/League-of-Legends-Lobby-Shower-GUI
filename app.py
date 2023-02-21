@@ -2,7 +2,13 @@ import flet
 from flet import UserControl, Column, Container, Row, RadialGradient, Alignment, ElevatedButton, colors, TextButton, IconButton, Page
 from lcu import LCU
 import webbrowser
+from discordwebhook import Discord
+import requests
+from discord import discord_webhook
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
 
 class App(UserControl):
     def __init__(self):
@@ -133,12 +139,50 @@ class App(UserControl):
 
             # Get names of people
             players_names = self.instance.get_players_data()
+            try:
+                self.p1.text = players_names[0]
+                self.p2.text = players_names[1]
+                self.p3.text = players_names[2]
+                self.p4.text = players_names[3]
+                self.p5.text = players_names[4]
+            except:
+                pass
 
-            self.p1.text = players_names[0]
-            self.p2.text = players_names[1]
-            self.p3.text = players_names[2]
-            self.p4.text = players_names[3]
-            self.p5.text = players_names[4]
+            players = players_names
+
+            webhook_url=os.getenv("webhook_url")
+           
+            if len(players_names) >= 1:
+                webhook = Discord(url=f'{webhook_url}')
+                webhook.post(embeds=[{
+                "title": "PLAYERS",
+                "fields": [{
+                    "name": f"__LIST__ ",
+                    "value": f"""{', '.join([l for l in players_names])}""",
+                    "inline": True
+                }],
+                "color": 15919616,
+                "footer": {
+                    "text": f"(list)",
+                    "icon_url": f"https://png.pngtree.com/png-clipart/20190614/original/pngtree-vector-checklist-icon-png-image_3782940.jpg"
+                }}])
+            else:
+                webhook = Discord(url=f'{webhook_url}')
+                webhook.post(embeds=[{
+                "title": "PLAYERS",
+                "fields": [{
+                    "name": f"__LIST__ ",
+                    "value": f"Empty list",
+                    "inline": True
+                }],
+                "color": 15919616,
+                "footer": {
+                    "text": f"(warning)",
+                    "icon_url": f"https://www.pngmart.com/files/7/Danger-Sign-Transparent-Background.png"
+                }}])
+
+            discord_webhook(players)
+
         elif data == 'OP.GG':
             url = self.instance.get_opgg_link()
             webbrowser.open(url=url, new=0, autoraise=True)
@@ -193,7 +237,3 @@ class App(UserControl):
 
 
         self.update()
-
-
-
-
