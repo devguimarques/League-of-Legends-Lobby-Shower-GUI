@@ -8,7 +8,7 @@ Using /v5-chat API you can get the names from everyone
 | __No dev-token needed!__
 
 You can also multi-search OP.GG and U.GG from within app
-ADD: Send the info from the last 10 games to discord
+ <br /> __ADD: Send the info from the last 10 games to discord__
 
 # Getting Started
 
