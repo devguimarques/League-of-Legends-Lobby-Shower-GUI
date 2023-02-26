@@ -1,16 +1,19 @@
 import requests
 from discordwebhook import Discord
-from traceback import print_exc
-from dotenv import load_dotenv
+import traceback
 import os
-
-load_dotenv()
-
+import json
 
 def discord_webhook(players):
 
-    api_key = os.getenv("api")
-    webhook_url = os.getenv("webhook_url")
+    path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'config.json'))
+
+    with open(path, 'r') as f:
+        config = json.load(f)
+
+    api = config['api']
+    webhook_url = config['webhook_url']
+
     link = 'https://euw1.api.riotgames.com'
 
     excluded_players = ['notorious pro', 'uncheap', 'bredwiners', 'chris dior']
@@ -25,7 +28,7 @@ def discord_webhook(players):
             try:
                 while True:
                     try:
-                        response = requests.get(f'{link}/lol/summoner/v4/summoners/by-name/{player}?api_key={api_key}').json()
+                        response = requests.get(f'{link}/lol/summoner/v4/summoners/by-name/{player}?api_key={api}').json()
                         puuid = response['puuid']
                         user_id = response['id']
                         break
@@ -34,13 +37,13 @@ def discord_webhook(players):
                 users = []
                 prob_champion = {}
 
-                response = requests.get(f'https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?api_key={api_key}')
+                response = requests.get(f'https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?api_key={api}')
                 matches = response.json()
                 del matches[10:20]
                 for m in matches:
-                    r = requests.get(f'https://europe.api.riotgames.com/lol/match/v5/matches/{m}?api_key={api_key}').json()
+                    r = requests.get(f'https://europe.api.riotgames.com/lol/match/v5/matches/{m}?api_key={api}').json()
                     type_queue = ":monkey: Match"
-                    cor = 14712638
+                    cor = 16744192
                     champ = None
                     count_champ = 0
                     for participant in r['info']['participants']:
@@ -68,12 +71,9 @@ def discord_webhook(players):
                                 type_queue = ':star: Flex Ranked Match'
 
                             try:
-                                kda = participant["challenges"]["kda"]
+                                kda = f'{participant["challenges"]["kda"]:.2f}'
                             except:
                                 kda = 'not found'
-
-                            if type(kda) is float:
-                                kda = f'{kda:.2f}'
 
                             a = f'''{type_queue} - **{participant["championName"]}** - {participant["kills"]}/{participant["deaths"]}/{participant["assists"]}:fire: kda {kda} - **{worl}**
                             '''
@@ -97,27 +97,24 @@ def discord_webhook(players):
                             count_champ = v
 
                     try:
-                        r2 = requests.get(f'https://euw1.api.riotgames.com/lol/league/v4/entries/by-summoner/{user_id}?api_key={api_key}').json()
+                        r2 = requests.get(f'https://euw1.api.riotgames.com/lol/league/v4/entries/by-summoner/{user_id}?api_key={api}').json()
                         tier = r2[0]['tier']
                         rank = r2[0]['rank']
                     except:
-                        tier = 'rank'
-                        rank = 'not found'
+                        tier = 'Unranked'
+                        rank = ''
                     try:
-                        r3 = requests.get(f'https://euw1.api.riotgames.com/lol/league/v4/entries/by-summoner/{user_id}?api_key={api_key}').json()
+                        r3 = requests.get(f'https://euw1.api.riotgames.com/lol/league/v4/entries/by-summoner/{user_id}?api_key={api}').json()
                         wins = r3[0]['wins']
                         losses = r3[0]['losses']
                     except:
                         wins = 0
                         losses = 0
                     
-                    if wins==0 and losses==0:
+                    if (wins==0) and (losses==0):
                         winrate = 'W/L not found'
                     else:
-                        winrate = wins/(wins+losses)*100
-
-                    if type(winrate) is float:
-                        winrate = f'{winrate:.2f}'
+                        winrate = f'{wins/(wins+losses)*100:.2f}'
 
                 webhook = Discord(url=f'{webhook_url}')
                 webhook.post(embeds=[{
@@ -142,7 +139,7 @@ def discord_webhook(players):
                 "fields": [{    
                     "name": f"__ERROR__ ",
                     "value": f"""SOMETHING WENT WRONG ({erro})
-                    {print_exc()}""",
+                    {traceback.print_exception()}""",
                     "inline": True
                 }],
                 "color": 15919616,
