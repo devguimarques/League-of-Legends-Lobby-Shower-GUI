@@ -3,12 +3,9 @@ from flet import UserControl, Column, Container, Row, RadialGradient, Alignment,
 from lcu import LCU
 import webbrowser
 from discordwebhook import Discord
-import requests
 from discord import discord_webhook
-from dotenv import load_dotenv
 import os
-
-load_dotenv()
+import json
 
 class App(UserControl):
     def __init__(self):
@@ -146,14 +143,20 @@ class App(UserControl):
                 self.p4.text = players_names[3]
                 self.p5.text = players_names[4]
             except:
+                
                 pass
 
             players = players_names
 
-            webhook_url=os.getenv("webhook_url")
+            path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'config.json'))
+
+            with open(path, 'r') as f:
+                config = json.load(f)
+
+            webhook_url = config['webhook_url']
            
             if len(players_names) >= 1:
-                webhook = Discord(url=f'{webhook_url}')
+                webhook = Discord(url=f"{webhook_url}")
                 webhook.post(embeds=[{
                 "title": "PLAYERS",
                 "fields": [{
@@ -167,7 +170,7 @@ class App(UserControl):
                     "icon_url": f"https://png.pngtree.com/png-clipart/20190614/original/pngtree-vector-checklist-icon-png-image_3782940.jpg"
                 }}])
             else:
-                webhook = Discord(url=f'{webhook_url}')
+                webhook = Discord(url=f"{webhook_url}")
                 webhook.post(embeds=[{
                 "title": "PLAYERS",
                 "fields": [{
