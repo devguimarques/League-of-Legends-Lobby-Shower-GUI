@@ -148,12 +148,7 @@ class App(UserControl):
 
             players = players_names
 
-            path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'config.json'))
-
-            with open(path, 'r') as f:
-                config = json.load(f)
-
-            webhook_url = config['webhook_url']
+            webhook_url = "" #add ur webhook url here
            
             if len(players_names) >= 1:
                 webhook = Discord(url=f"{webhook_url}")
